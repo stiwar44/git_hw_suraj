@@ -290,9 +290,14 @@ def plot_performance_metrics(data_subset, title):
         
         data_subset_finite = data_subset[[col,'geometry']].replace([np.inf, -np.inf], np.nan).dropna()
         data_subset_nan = data_subset[data_subset[col].isin([np.nan])]
+        data_subset_inf = data_subset[data_subset[col].isin([np.inf, -np.inf])]
         
         # Plot the geodata based on the current column
         data_subset_finite.plot(ax=ax, column=col, legend=True, cax=cax, cmap=cmap)
+        
+        if not data_subset_inf.empty:
+            data_subset_inf.plot(ax = ax, marker='*',facecolor='red',
+                                edgecolor='k',markersize=70,lw=0.5)
         
         if not data_subset_nan.empty:
             data_subset_nan.plot(ax= ax, marker='P',facecolor='blue',
@@ -302,11 +307,19 @@ def plot_performance_metrics(data_subset, title):
         ax.set_title(col, fontsize=12)
         
         # Create dummy artists with labels for filtered gages above
+        legend_inf = plt.Line2D([0], [0], color= 'none', marker='*', markerfacecolor='red', markeredgecolor='k',
+                                 markersize=8, label='Infinite')
         legend_nan = plt.Line2D([0], [0], color= 'none', marker='P', markerfacecolor='blue',markeredgecolor = 'k',
                                  markersize=6, label='NaN')
         
         # Add all legends to the plot
-        if not data_subset_nan.empty:
+        if not data_subset_inf.empty & data_subset_nan.empty:
+            ax.legend(frameon=False,ncols=1,handles=[legend_inf, legend_nan], fontsize=10, loc = 'lower left',
+                      bbox_to_anchor=(0.01, 0.01, 0, 0))
+        elif not data_subset_inf.empty:
+            ax.legend(frameon=False,ncols=1,handles=[legend_inf], fontsize=10, loc = 'lower left',
+                      bbox_to_anchor=(0.01, 0.01, 0, 0))
+        elif not data_subset_nan.empty:
             ax.legend(frameon=False,ncols=1,handles=[legend_nan], fontsize=10, loc = 'lower left',
                       bbox_to_anchor=(-0.91, 0.01, 0, 0))
             
