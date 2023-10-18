@@ -288,12 +288,27 @@ def plot_performance_metrics(data_subset, title):
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="2.5%", pad=-0.4)
         
-        # Plot the geodata based on the current column
-        data_subset.plot(ax=ax, column=col, legend=True, cax=cax, cmap=cmap)
+        data_subset_finite = data_subset[[col,'geometry']].replace([np.inf, -np.inf], np.nan).dropna()
+        data_subset_nan = data_subset[data_subset[col].isin([np.nan])]
         
+        # Plot the geodata based on the current column
+        data_subset_finite.plot(ax=ax, column=col, legend=True, cax=cax, cmap=cmap)
+        
+        if not data_subset_nan.empty:
+            data_subset_nan.plot(ax= ax, marker='P',facecolor='blue',
+                                edgecolor='k',markersize=35,lw=0.5)
         ax.set_xlabel("Longitude (deg)")
         ax.set_ylabel("Latitude (deg)")
         ax.set_title(col, fontsize=12)
+        
+        # Create dummy artists with labels for filtered gages above
+        legend_nan = plt.Line2D([0], [0], color= 'none', marker='P', markerfacecolor='blue',markeredgecolor = 'k',
+                                 markersize=6, label='NaN')
+        
+        # Add all legends to the plot
+        if not data_subset_nan.empty:
+            ax.legend(frameon=False,ncols=1,handles=[legend_nan], fontsize=10, loc = 'lower left',
+                      bbox_to_anchor=(-0.91, 0.01, 0, 0))
             
     # Adjust the layout for better visuals
     fig.subplots_adjust(hspace=-0.9, wspace=-0.25)
