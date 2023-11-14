@@ -10,6 +10,7 @@ import os
 # navigate to the path where corresponding NWM feature ids are stored for USGS gages
 path1 = r'\\en4143590nas.sebe.dhcp.asu.edu\SHARED\NWM_RetrospectiveAnalysis'
 
+# Reading USGS and NWM data: Load mapping and discharge data from predefined file paths.
 # read the USGS gages and NWM feature id listed file as a dataframe
 USGS_NWM = pd.read_csv(os.path.join(path1, 'USGS_gages_corresponding_NWM_ST.txt'),dtype = 'str')
 USGS_NWM = USGS_NWM.set_index('USGS_gages')
@@ -77,6 +78,7 @@ for nwm_feature_id in unique_nwm_id:
 # Resample the hourly NWM data to daily averages
 nwm_daily_avg = nwm_df.resample('D').mean()
 
+# Defining Analysis Functions: These functions calculate various statistical metrics to evaluate model performance against observed data.
 # define a function to calculate the Nash Sutcliffe Efficiency between observed and simulated data
 def calculate_nse(obs, sim):
     # Calculate the Nash-Sutcliffe Efficiency (NSE).
@@ -161,6 +163,7 @@ for usgs_col in usgs_df.columns:
         rb.append(rb_NWM)
         rmsre.append(rmsre_NWM)
         
+        # Data Visualization: Generating plots to visually compare USGS and NWM data, and mapping gage locations with performance metrics.
         # Plotting
         fig, ax = plt.subplots(1, 2, figsize=(10, 4))
         
